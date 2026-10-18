@@ -68,7 +68,16 @@ buscarExtremos (x:xs) mayor menor
 
 -- A3
 leerHora :: String -> Either String (Int, Int)
-leerHora = undefined
+leerHora [a, b, ':', c, d]
+  | not (isDigit a && isDigit b && isDigit c && isDigit d) =
+      Left "formato inválido"
+  | hora > 23 = Left "hora fuera de rango"
+  | minutos > 59 = Left "minutos fuera de rango"
+  | otherwise = Right (hora, minutos)
+  where
+    hora = digitToInt a * 10 + digitToInt b
+    minutos = digitToInt c * 10 + digitToInt d
+leerHora _ = Left "formato inválido"
 
 duracion :: String -> String -> Either String Int
 duracion = undefined
