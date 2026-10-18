@@ -35,20 +35,19 @@ import Data.Char (isAlphaNum, isDigit, toLower, digitToInt)
 
 -- A1
 esPalindromo :: String -> Bool
-esPalindromo = texto = limpio == invertir limpio
-  where 
-   limpio = limpiar texto
+esPalindromo texto = limpio == invertir limpio
+  where
+    limpio = limpiar texto
 
 limpiar :: String -> String
-limpiar []=[] 
+limpiar [] = []
 limpiar (x:xs)
-  isAlphaNum x = toLower x: limpiar xs
-  otherwise = limpiar xs
+  | isAlphaNum x = toLower x : limpiar xs
+  | otherwise = limpiar xs
 
 invertir :: String -> String
-invertir []=[]
+invertir [] = []
 invertir (x:xs) = invertir xs ++ [x]
-
 
 -- A2
 -- Uso el primer elemento como mayor y menor iniciales.
@@ -80,7 +79,20 @@ leerHora [a, b, ':', c, d]
 leerHora _ = Left "formato inválido"
 
 duracion :: String -> String -> Either String Int
-duracion = undefined
+duracion inicio fin =
+  case leerHora inicio of
+    Left mensaje -> Left mensaje
+    Right (h1, m1) ->
+      case leerHora fin of
+        Left mensaje -> Left mensaje
+        Right (h2, m2) ->
+          let minutosInicio = h1 * 60 + m1
+              minutosFin = h2 * 60 + m2
+              diferencia = minutosFin - minutosInicio
+          in if diferencia < 0
+             then Right (diferencia + 1440)
+             else Right diferencia
+
 
 -- =====================================================================
 -- Parte B: orden superior.
@@ -90,7 +102,15 @@ duracion = undefined
 
 -- B1
 promedioSobreUmbral :: Double -> [Double] -> Maybe Double
-promedioSobreUmbral = undefined
+promedioSobreUmbral umbral numeros =
+  case foldl (acumular umbral) (0, 0) numeros of
+    (_, 0) -> Nothing
+    (suma, cantidad) -> Just (suma / cantidad)
+
+acumular :: Double -> (Double, Double) -> Double -> (Double, Double)
+acumular umbral (suma, cantidad) x
+  | x > umbral = (suma + x, cantidad + 1)
+  | otherwise = (suma, cantidad)
 
 -- B2
 movimientosCaballo :: (Int, Int) -> [(Int, Int)]
