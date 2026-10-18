@@ -1,10 +1,11 @@
 -- =====================================================================
 --  CI-3661 — Tarea 1 (Haskell) — Septiembre–Diciembre 2026
 --
---  Nombre:
---  Carnet:
+--  Nombre: Nazareth Colmenares
+--  Carnet: 20-10017
 --
 --  Declaración de uso de herramientas de IA (obligatoria, ver enunciado):
+-- 
 --
 -- =====================================================================
 --  No cambies el nombre del módulo ni la lista de exportación, ni las
@@ -34,7 +35,20 @@ import Data.Char (isAlphaNum, isDigit, toLower, digitToInt)
 
 -- A1
 esPalindromo :: String -> Bool
-esPalindromo = undefined
+esPalindromo = texto = limpio == invertir limpio
+  where 
+   limpio = limpiar texto
+
+limpiar :: String -> String
+limpiar []=[] 
+limpiar (x:xs)
+  isAlphaNum x = toLower x: limpiar xs
+  otherwise = limpiar xs
+
+invertir :: String -> String
+invertir []=[]
+invertir (x:xs) = invertir xs ++ [x]
+
 
 -- A2
 -- Explica aquí, en dos o tres líneas, por qué tu solución recorre la
