@@ -51,11 +51,20 @@ invertir (x:xs) = invertir xs ++ [x]
 
 
 -- A2
--- Explica aquí, en dos o tres líneas, por qué tu solución recorre la
--- lista una sola vez:
---
+-- Uso el primer elemento como mayor y menor iniciales.
+-- El auxiliar procesa una vez cada elemento restante y actualiza
+-- ambos valores sin volver a recorrer la lista.
+
 mayorYMenor :: Ord a => [a] -> Maybe (a, a)
-mayorYMenor = undefined
+mayorYMenor [] = Nothing
+mayorYMenor (x:xs) = buscarExtremos xs x x
+
+buscarExtremos :: Ord a => [a] -> a -> a -> Maybe (a, a)
+buscarExtremos [] mayor menor = Just (mayor, menor)
+buscarExtremos (x:xs) mayor menor
+  | x > mayor = buscarExtremos xs x menor
+  | x < menor = buscarExtremos xs mayor x
+  | otherwise = buscarExtremos xs mayor menor
 
 -- A3
 leerHora :: String -> Either String (Int, Int)
