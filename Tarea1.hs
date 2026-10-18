@@ -114,10 +114,32 @@ acumular umbral (suma, cantidad) x
 
 -- B2
 movimientosCaballo :: (Int, Int) -> [(Int, Int)]
-movimientosCaballo = undefined
+movimientosCaballo (fila, columna) =
+  [ (nuevaFila, nuevaColumna)
+  | (df, dc) <- [(-2,-1), (-2,1), (-1,-2), (-1,2),
+                 (1,-2), (1,2), (2,-1), (2,1)]
+  , let nuevaFila = fila + df
+  , let nuevaColumna = columna + dc
+  , nuevaFila >= 1
+  , nuevaFila <= 8
+  , nuevaColumna >= 1
+  , nuevaColumna <= 8
+  ]
 
 enDosSaltos :: (Int, Int) -> Int
-enDosSaltos = undefined
+enDosSaltos posicion =
+  length (foldr agregarSinRepetir [] destinos)
+  where
+    destinos =
+      [ destino
+      | intermedia <- movimientosCaballo posicion
+      , destino <- movimientosCaballo intermedia
+      ]
+
+agregarSinRepetir :: (Int, Int) -> [(Int, Int)] -> [(Int, Int)]
+agregarSinRepetir casilla casillas
+  | elem casilla casillas = casillas
+  | otherwise = casilla : casillas
 
 -- B3
 miMap :: (a -> b) -> [a] -> [b]
