@@ -142,11 +142,22 @@ agregarSinRepetir casilla casillas
   | otherwise = casilla : casillas
 
 -- B3
+
 miMap :: (a -> b) -> [a] -> [b]
-miMap = undefined
+miMap f lista =
+  foldr (\x acumulado -> f x : acumulado) [] lista
 
 miFilter :: (a -> Bool) -> [a] -> [a]
-miFilter = undefined
+miFilter condicion lista =
+  foldr (\x acumulado ->
+           if condicion x
+           then x : acumulado
+           else acumulado) [] lista
 
 miFoldl :: (b -> a -> b) -> b -> [a] -> b
-miFoldl = undefined
+miFoldl f inicial lista =
+  foldr
+    (\x siguiente acumulado -> siguiente (f acumulado x))
+    (\acumulado -> acumulado)
+    lista
+    inicial
