@@ -1,0 +1,172 @@
+Tarea 1 - Práctica de Haskell
+Problema 7: Evaluación por sustitución
+
+Nombre: Nazareth Colmenares
+Carnet: 20-10017
+
+
+Los últimos cuatro dígitos de mi carnet, en orden, son:
+
+d = [0, 0, 1, 7]
+
+Por tanto, d1 = 0 y d2 = 0.
+
+======================================================================
+(a) Reducción de foldr (-) 0 d
+======================================================================
+
+Ecuaciones utilizadas:
+
+foldr f z []     = z
+foldr f z (x:xs) = f x (foldr f z xs)
+
+Sustituyendo d por [0,0,1,7]:
+
+foldr (-) 0 [0,0,1,7]
+= 0 - (foldr (-) 0 [0,1,7])
+= 0 - (0 - (foldr (-) 0 [1,7]))
+= 0 - (0 - (1 - (foldr (-) 0 [7])))
+= 0 - (0 - (1 - (7 - (foldr (-) 0 []))))
+= 0 - (0 - (1 - (7 - 0)))
+= 0 - (0 - (1 - 7))
+= 0 - (0 - (-6))
+= 0 - 6
+= -6
+
+Las primeras cuatro igualdades usan la ecuación de foldr para una
+lista no vacía. La quinta usa el caso base. Las restantes realizan
+las operaciones aritméticas respetando los paréntesis.
+
+Resultado: -6.
+
+======================================================================
+(b) Reducción de foldl (-) 0 d
+======================================================================
+
+Ecuaciones utilizadas:
+
+foldl f z []     = z
+foldl f z (x:xs) = foldl f (f z x) xs
+
+Sustituyendo d por [0,0,1,7]:
+
+foldl (-) 0 [0,0,1,7]
+= foldl (-) (0 - 0) [0,1,7]
+= foldl (-) ((0 - 0) - 0) [1,7]
+= foldl (-) (((0 - 0) - 0) - 1) [7]
+= foldl (-) ((((0 - 0) - 0) - 1) - 7) []
+= (((0 - 0) - 0) - 1) - 7
+= ((0 - 0) - 1) - 7
+= (0 - 1) - 7
+= -1 - 7
+= -8
+
+Las primeras cuatro igualdades usan la ecuación de foldl para una
+lista no vacía. La quinta usa el caso base. Después se resuelven
+las restas del acumulador.
+
+Resultado: -8.
+
+======================================================================
+(c) Reducción de miFoldl (-) 0 [d1,d2]
+======================================================================
+
+Como d1 = 0 y d2 = 0, la expresión es miFoldl (-) 0 [0,0].
+
+Definición utilizada en Tarea1.hs:
+
+miFoldl :: (b -> a -> b) -> b -> [a] -> b
+miFoldl f inicial lista =
+  foldr
+    (\x siguiente acumulado -> siguiente (f acumulado x))
+    (\acumulado -> acumulado)
+    lista
+    inicial
+
+Para abreviar la escritura, después de sustituir f por (-), defino:
+
+paso = \x siguiente acumulado -> siguiente (acumulado - x)
+base = \acumulado -> acumulado
+
+Estas abreviaturas son locales a la traza; no modifican el código.
+La aplicación de funciones se agrupa a la izquierda. Por ejemplo,
+foldr paso base [0,0] 0 significa (foldr paso base [0,0]) 0.
+
+En una beta-reducción se aplica una función anónima sustituyendo
+su parámetro por el argumento recibido.
+
+Reducción paso a paso:
+
+miFoldl (-) 0 [0,0]
+
+= (foldr paso base [0,0]) 0
+  [Definición de miFoldl con f = (-), inicial = 0 y lista = [0,0].]
+
+= (paso 0 (foldr paso base [0])) 0
+  [Ecuación de foldr para una lista no vacía.]
+
+= (paso 0 (paso 0 (foldr paso base []))) 0
+  [Ecuación de foldr para una lista no vacía.]
+
+= (paso 0 (paso 0 base)) 0
+  [Caso base de foldr.]
+
+= ((\x siguiente acumulado -> siguiente (acumulado - x))
+     0 (paso 0 base)) 0
+  [Expansión de la primera aparición de paso.]
+
+= ((\siguiente acumulado -> siguiente (acumulado - 0))
+     (paso 0 base)) 0
+  [Beta-reducción: x se sustituye por 0.]
+
+= (\acumulado -> (paso 0 base) (acumulado - 0)) 0
+  [Beta-reducción: siguiente se sustituye por paso 0 base.]
+
+= (paso 0 base) (0 - 0)
+  [Beta-reducción: acumulado se sustituye por 0.]
+
+= ((\x siguiente acumulado -> siguiente (acumulado - x))
+     0 base) (0 - 0)
+  [Expansión de la aparición restante de paso.]
+
+= ((\siguiente acumulado -> siguiente (acumulado - 0))
+     base) (0 - 0)
+  [Beta-reducción: x se sustituye por 0.]
+
+= (\acumulado -> base (acumulado - 0)) (0 - 0)
+  [Beta-reducción: siguiente se sustituye por base.]
+
+= base ((0 - 0) - 0)
+  [Beta-reducción: acumulado se sustituye por (0 - 0).]
+
+= (\acumulado -> acumulado) ((0 - 0) - 0)
+  [Expansión de base.]
+
+= (0 - 0) - 0
+  [Beta-reducción.]
+
+= 0 - 0
+  [Aritmética.]
+
+= 0
+  [Aritmética.]
+
+Resultado: 0.
+
+======================================================================
+(d) Diferencia entre los plegados y condición de igualdad
+======================================================================
+
+Para los dígitos de mi carnet, foldr (-) 0 [0,0,1,7] produce -6,
+mientras que foldl (-) 0 [0,0,1,7] produce -8. La diferencia se debe
+a la agrupación: foldr construye 0 - (0 - (1 - (7 - 0))), mientras
+que foldl construye (((0 - 0) - 0) - 1) - 7. Como la resta no es
+asociativa, cambiar los paréntesis puede cambiar el resultado. Una
+condición suficiente para que foldr op z xs == foldl op z xs para
+toda lista finita de valores definidos es que op sea una operación
+asociativa y que z sea su elemento neutro por ambos lados. Es decir,
+op (op a b) c = op a (op b c), op z a = a y op a z = a. La
+asociatividad permite reagrupar sin cambiar el resultado y el neutro
+permite eliminar z de cualquiera de los extremos. No se requiere
+conmutatividad; por ejemplo, la concatenación de listas con [] cumple
+estas condiciones. También las cumple la suma de Integer con 0.

@@ -5,7 +5,9 @@
 --  Carnet: 20-10017
 --
 --  Declaración de uso de herramientas de IA (obligatoria, ver enunciado):
--- 
+-- utilicé IA como apoyo para interpretar el enunciado y aclarar
+-- conceptos de recursión, funciones y evaluación por
+-- sustitución.
 --
 -- =====================================================================
 --  No cambies el nombre del módulo ni la lista de exportación, ni las
